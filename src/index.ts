@@ -21,6 +21,26 @@ export function yaml(strings: TemplateStringsArray, ...values: any[]): z.ZodType
 }
 
 /**
+ * Utility function to convert a YAML string directly to a Zod schema
+ * @param yamlString The YAML schema as a string
+ * @returns A Zod schema
+ */
+export function fromYaml(yamlString: string): z.ZodTypeAny {
+  const parsed = load(yamlString);
+  return convertToZodSchema(parsed);
+}
+
+/**
+ * Utility function to convert a JavaScript object to a Zod schema
+ * This is useful when you already have a parsed JSON Schema object
+ * @param schemaObj The schema object
+ * @returns A Zod schema
+ */
+export function fromSchemaObject(schemaObj: any): z.ZodTypeAny {
+  return convertToZodSchema(schemaObj);
+}
+
+/**
  * Convert a parsed YAML schema to a Zod schema
  * @param schema The parsed YAML schema definition
  * @returns A Zod schema
