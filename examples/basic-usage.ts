@@ -1,36 +1,46 @@
-import { yaml } from '../src';
+import { ts } from '../src';
 import { z } from 'zod';
 
-// Define a User schema using YAML syntax
-const userSchema = yaml`
-type: object
-properties:
-  name:
-    type: string
+// Define a User schema using TypeScript-style syntax
+const userSchema = ts`
+type: 'object',
+properties: {
+  name: {
+    type: 'string',
     minLength: 2
-  age:
-    type: number
+  },
+  age: {
+    type: 'number',
     minimum: 18
-  email:
-    type: string
-    format: email
-  role:
-    enum:
-      - admin
-      - user
-      - guest
-  metadata:
-    type: object
+  },
+  email: {
+    type: 'string',
+    format: 'email'
+  },
+  role: {
+    enum: [
+      'admin',
+      'user',
+      'guest'
+    ]
+  },
+  metadata: {
+    type: 'object',
     additionalProperties: true
-  tags:
-    type: array
-    items:
-      type: string
+  },
+  tags: {
+    type: 'array',
+    items: {
+      type: 'string'
+    },
     uniqueItems: true
-required:
-  - name
-  - email
-  - role
+  }
+},
+required: [
+  'name',
+  'email',
+  'role'
+]
 `;
 
 // Example of validation with the schema

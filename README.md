@@ -1,6 +1,6 @@
 # zod-tag
 
-A template literal tag for converting YAML strings to Zod schemas.
+A template literal tag for converting TypeScript-style objects to Zod schemas.
 
 ## Installation
 
@@ -12,24 +12,29 @@ npm install zod-tag
 
 ```typescript
 import { z } from 'zod';
-import { yaml } from 'zod-tag';
+import { ts } from 'zod-tag';
 
-// Define a schema using YAML
-const userSchema = yaml`
-type: object
-properties:
-  name:
-    type: string
+// Define a schema using TypeScript-style syntax
+const userSchema = ts`
+type: 'object',
+properties: {
+  name: {
+    type: 'string',
     minLength: 2
-  age:
-    type: number
+  },
+  age: {
+    type: 'number',
     minimum: 18
-  email:
-    type: string
-    format: email
-required:
-  - name
-  - email
+  },
+  email: {
+    type: 'string',
+    format: 'email'
+  }
+},
+required: [
+  'name',
+  'email'
+]
 `;
 
 // Use the schema for validation
@@ -50,7 +55,7 @@ console.log(userSchema.safeParse(invalidUser)); // { success: false, error: ZodE
 
 ## Features
 
-- Write Zod schemas using YAML syntax
+- Write Zod schemas using TypeScript-style syntax
 - Full type safety with TypeScript
 - Support for all basic Zod schema types
 - Nested schemas support

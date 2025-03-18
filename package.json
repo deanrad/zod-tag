@@ -1,7 +1,7 @@
 {
   "name": "zod-tag",
   "version": "0.1.0",
-  "description": "A template literal tag for converting YAML strings to Zod schemas",
+  "description": "A template literal tag for converting TypeScript-style objects to Zod schemas",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
@@ -14,7 +14,7 @@
   },
   "keywords": [
     "zod",
-    "yaml",
+    "typescript",
     "schema",
     "validation",
     "template-literal",
@@ -23,12 +23,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "js-yaml": "^4.1.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
-    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.13.10",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.6",
