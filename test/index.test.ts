@@ -1,12 +1,12 @@
-import { ts } from '../src';
+import { yaml } from '../src';
 import { z } from 'zod';
 
-describe('ts tagged template', () => {
+describe('yaml tagged template', () => {
   describe('basic types', () => {
     test('string schema', () => {
-      const schema = ts`
-        type: 'string',
-        minLength: 2,
+      const schema = yaml`
+        type: string
+        minLength: 2
         maxLength: 10
       `;
 
@@ -17,9 +17,9 @@ describe('ts tagged template', () => {
     });
 
     test('number schema', () => {
-      const schema = ts`
-        type: 'number',
-        minimum: 5,
+      const schema = yaml`
+        type: number
+        minimum: 5
         maximum: 10
       `;
 
@@ -30,9 +30,9 @@ describe('ts tagged template', () => {
     });
 
     test('integer schema', () => {
-      const schema = ts`
-        type: 'integer',
-        minimum: 1,
+      const schema = yaml`
+        type: integer
+        minimum: 1
         maximum: 5
       `;
 
@@ -43,8 +43,8 @@ describe('ts tagged template', () => {
     });
 
     test('boolean schema', () => {
-      const schema = ts`
-        type: 'boolean'
+      const schema = yaml`
+        type: boolean
       `;
 
       expect(schema).toBeInstanceOf(z.ZodBoolean);
@@ -54,8 +54,8 @@ describe('ts tagged template', () => {
     });
 
     test('null schema', () => {
-      const schema = ts`
-        type: 'null'
+      const schema = yaml`
+        type: "null"
       `;
 
       expect(schema).toBeInstanceOf(z.ZodNull);
@@ -67,12 +67,11 @@ describe('ts tagged template', () => {
 
   describe('array schema', () => {
     test('array of strings', () => {
-      const schema = ts`
-        type: 'array',
-        items: {
-          type: 'string'
-        },
-        minItems: 1,
+      const schema = yaml`
+        type: array
+        items:
+          type: string
+        minItems: 1
         maxItems: 3
       `;
 
@@ -85,11 +84,10 @@ describe('ts tagged template', () => {
     });
 
     test('array with unique items', () => {
-      const schema = ts`
-        type: 'array',
-        items: {
-          type: 'number'
-        },
+      const schema = yaml`
+        type: array
+        items:
+          type: number
         uniqueItems: true
       `;
 
@@ -100,17 +98,15 @@ describe('ts tagged template', () => {
 
   describe('object schema', () => {
     test('simple object', () => {
-      const schema = ts`
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string'
-          },
-          age: {
-            type: 'number'
-          }
-        },
-        required: ['name']
+      const schema = yaml`
+        type: object
+        properties:
+          name:
+            type: string
+          age:
+            type: number
+        required:
+          - name
       `;
 
       expect(schema).toBeInstanceOf(z.ZodObject);
@@ -122,32 +118,27 @@ describe('ts tagged template', () => {
     });
 
     test('nested object', () => {
-      const schema = ts`
-        type: 'object',
-        properties: {
-          user: {
-            type: 'object',
-            properties: {
-              name: {
-                type: 'string'
-              },
-              address: {
-                type: 'object',
-                properties: {
-                  street: {
-                    type: 'string'
-                  },
-                  city: {
-                    type: 'string'
-                  }
-                },
-                required: ['city']
-              }
-            },
-            required: ['name']
-          }
-        },
-        required: ['user']
+      const schema = yaml`
+        type: object
+        properties:
+          user:
+            type: object
+            properties:
+              name:
+                type: string
+              address:
+                type: object
+                properties:
+                  street:
+                    type: string
+                  city:
+                    type: string
+                required:
+                  - city
+            required:
+              - name
+        required:
+          - user
       `;
 
       expect(schema.safeParse({}).success).toBe(false);
@@ -170,26 +161,22 @@ describe('ts tagged template', () => {
     });
 
     test('additionalProperties handling', () => {
-      const strictSchema = ts`
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string'
-          }
-        },
+      const strictSchema = yaml`
+        type: object
+        properties:
+          name: 
+            type: string
         additionalProperties: false
       `;
 
       expect(strictSchema.safeParse({ name: 'John' }).success).toBe(true);
       expect(strictSchema.safeParse({ name: 'John', age: 30 }).success).toBe(false);
 
-      const passthroughSchema = ts`
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string'
-          }
-        },
+      const passthroughSchema = yaml`
+        type: object
+        properties:
+          name: 
+            type: string
         additionalProperties: true
       `;
 
@@ -199,9 +186,9 @@ describe('ts tagged template', () => {
 
   describe('special formats', () => {
     test('email format', () => {
-      const schema = ts`
-        type: 'string',
-        format: 'email'
+      const schema = yaml`
+        type: string
+        format: email
       `;
 
       expect(schema.safeParse('not-an-email').success).toBe(false);
@@ -209,9 +196,9 @@ describe('ts tagged template', () => {
     });
 
     test('url format', () => {
-      const schema = ts`
-        type: 'string',
-        format: 'url'
+      const schema = yaml`
+        type: string
+        format: url
       `;
 
       expect(schema.safeParse('not-a-url').success).toBe(false);
@@ -221,11 +208,10 @@ describe('ts tagged template', () => {
 
   describe('union types', () => {
     test('oneOf union', () => {
-      const schema = ts`
-        oneOf: [
-          { type: 'string' },
-          { type: 'number' }
-        ]
+      const schema = yaml`
+        oneOf:
+          - type: string
+          - type: number
       `;
 
       expect(schema.safeParse('test').success).toBe(true);
@@ -236,12 +222,11 @@ describe('ts tagged template', () => {
 
   describe('enum types', () => {
     test('enum values', () => {
-      const schema = ts`
-        enum: [
-          'red',
-          'green',
-          'blue'
-        ]
+      const schema = yaml`
+        enum:
+          - red
+          - green
+          - blue
       `;
 
       expect(schema.safeParse('red').success).toBe(true);
@@ -253,9 +238,9 @@ describe('ts tagged template', () => {
   describe('template interpolation', () => {
     test('variable interpolation', () => {
       const minLength = 3;
-      const schema = ts`
-        type: 'string',
-        minLength: ${minLength},
+      const schema = yaml`
+        type: string
+        minLength: ${minLength}
         maxLength: 10
       `;
 
@@ -266,8 +251,8 @@ describe('ts tagged template', () => {
 
   describe('edge cases and limitations', () => {
     test('unrecognized type defaults to any', () => {
-      const schema = ts`
-        type: 'unknown-type'
+      const schema = yaml`
+        type: unknown-type
       `;
 
       expect(schema).toBeInstanceOf(z.ZodAny);
@@ -275,24 +260,18 @@ describe('ts tagged template', () => {
     });
 
     test('reference handling (limitation)', () => {
-      // TypeScript-style schema still supports references
-      const schema = ts`
-        type: 'object',
-        properties: {
-          user: {
+      // YAML/JSON Schema supports $ref for references, which would be challenging to implement
+      const schema = yaml`
+        type: object
+        properties:
+          user:
             $ref: '#/definitions/User'
-          }
-        },
-        definitions: {
-          User: {
-            type: 'object',
-            properties: {
-              name: {
-                type: 'string'
-              }
-            }
-          }
-        }
+        definitions:
+          User:
+            type: object
+            properties:
+              name:
+                type: string
       `;
 
       // Currently $ref fields are converted to z.any()

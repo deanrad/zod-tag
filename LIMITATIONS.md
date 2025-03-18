@@ -1,6 +1,6 @@
 # Limitations and Challenges
 
-This document outlines the current limitations and challenges of the `zod-tag` library, which uses a tagged template literal approach to convert TypeScript-style syntax into Zod schemas.
+This document outlines the current limitations and challenges of the `zod-tag` library, which uses a tagged template literal approach to convert YAML strings into Zod schemas.
 
 ## Current Limitations
 
@@ -8,23 +8,17 @@ This document outlines the current limitations and challenges of the `zod-tag` l
 
 **Challenge:** JSON Schema allows defining reusable schema components and referencing them with `$ref` pointers. For example:
 
-```typescript
-type: 'object',
-properties: {
-  user: {
+```yaml
+type: object
+properties:
+  user:
     $ref: '#/definitions/User'
-  }
-},
-definitions: {
-  User: {
-    type: 'object',
-    properties: {
-      name: {
-        type: 'string'
-      }
-    }
-  }
-}
+definitions:
+  User:
+    type: object
+    properties:
+      name:
+        type: string
 ```
 
 This feature is crucial for schema reuse but requires resolver logic that would:
@@ -64,26 +58,22 @@ This feature is crucial for schema reuse but requires resolver logic that would:
 - Recursive types
 
 **Possible Solution:**
-- Extend TypeScript-style syntax with custom directives or properties that map to these Zod-specific features
+- Extend YAML syntax with custom directives or properties that map to these Zod-specific features
 
 Example syntax extension (not currently implemented):
 
-```typescript
-type: 'string',
-transform: {
-  toLowerCase: true  // Custom property to represent Zod's transform
-},
-zod: {
-  refine: {
-    message: "Must be a valid username",
-    test: "value => value.length > 3 && /^[a-z0-9]+$/.test(value)"
-  }
-}
+```yaml
+type: string
+transform:
+  - toLowerCase: true  # Custom property to represent Zod's transform
+zod:refine:   # Custom property for refinements
+  message: "Must be a valid username"
+  test: "value => value.length > 3 && /^[a-z0-9]+$/.test(value)"
 ```
 
 ### Schema Type Inference
 
-**Challenge:** One of Zod's strengths is TypeScript integration, but inferring accurate types from TypeScript-defined schemas is challenging.
+**Challenge:** One of Zod's strengths is TypeScript integration, but inferring accurate types from YAML-defined schemas is challenging.
 
 **Possible Solution:**
 - Generate TypeScript type declarations alongside schemas
@@ -93,11 +83,11 @@ zod: {
 
 1. **Performance:** The current implementation parses and converts the schema on each template literal invocation. For repeated use, a caching mechanism could improve performance.
 
-2. **Error Reporting:** Enhancing error messages to point to the specific location in the TypeScript schema where validation failed would improve developer experience.
+2. **Error Reporting:** Enhancing error messages to point to the specific location in the YAML where validation failed would improve developer experience.
 
-3. **Type Safety:** While the library provides runtime type validation, enhancing static type inference from TypeScript would make it more powerful.
+3. **Type Safety:** While the library provides runtime type validation, enhancing static type inference from YAML would make it more powerful.
 
-4. **Custom Extensions:** Creating a well-defined syntax for extending the TypeScript schema format to support Zod-specific features without breaking compatibility.
+4. **Custom Extensions:** Creating a well-defined syntax for extending the YAML schema format to support Zod-specific features without breaking compatibility.
 
 ## Future Directions
 

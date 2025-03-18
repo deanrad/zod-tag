@@ -1,60 +1,38 @@
+import { load } from 'js-yaml';
 import { z } from 'zod';
 
 /**
- * Convert a TypeScript-style schema definition to a Zod schema
+ * Convert a YAML schema definition to a Zod schema
  * @param strings Template literal strings
  * @param values Template literal values to be interpolated
  * @returns Zod schema
  */
-export function ts(strings: TemplateStringsArray, ...values: any[]): z.ZodTypeAny {
+export function yaml(strings: TemplateStringsArray, ...values: any[]): z.ZodTypeAny {
   // Combine the template literal parts
-  const tsString = strings.reduce((acc, str, i) => {
+  const yamlString = strings.reduce((acc, str, i) => {
     return acc + str + (values[i] || '');
   }, '');
 
-  // Parse the TypeScript-style string to JS object
-  const parsed = parseTypeScriptSchema(tsString);
+  // Parse YAML to JS object
+  const parsed = load(yamlString);
 
-  // Convert the parsed schema to a Zod schema
+  // Convert the parsed YAML schema to a Zod schema
   return convertToZodSchema(parsed);
 }
 
 /**
- * Parse TypeScript-style schema string to a JavaScript object
- * @param tsString The TypeScript-style schema string
- * @returns Parsed JavaScript object
- */
-function parseTypeScriptSchema(tsString: string): any {
-  // Wrap in a function to allow for evaluation
-  const fnBody = `
-    return {
-      ${tsString}
-    };
-  `;
-
-  try {
-    // Create and execute a function to evaluate the TypeScript-style schema
-    const fn = new Function(fnBody);
-    return fn();
-  } catch (error) {
-    console.error('Error parsing TypeScript schema:', error);
-    throw new Error(`Failed to parse TypeScript schema: ${(error as Error).message}`);
-  }
-}
-
-/**
- * Utility function to convert a TypeScript string directly to a Zod schema
- * @param tsString The TypeScript schema as a string
+ * Utility function to convert a YAML string directly to a Zod schema
+ * @param yamlString The YAML schema as a string
  * @returns A Zod schema
  */
-export function fromTypeScript(tsString: string): z.ZodTypeAny {
-  const parsed = parseTypeScriptSchema(tsString);
+export function fromYaml(yamlString: string): z.ZodTypeAny {
+  const parsed = load(yamlString);
   return convertToZodSchema(parsed);
 }
 
 /**
  * Utility function to convert a JavaScript object to a Zod schema
- * This is useful when you already have a parsed schema object
+ * This is useful when you already have a parsed JSON Schema object
  * @param schemaObj The schema object
  * @returns A Zod schema
  */
@@ -63,8 +41,8 @@ export function fromSchemaObject(schemaObj: any): z.ZodTypeAny {
 }
 
 /**
- * Convert a parsed schema to a Zod schema
- * @param schema The parsed schema definition
+ * Convert a parsed YAML schema to a Zod schema
+ * @param schema The parsed YAML schema definition
  * @returns A Zod schema
  */
 function convertToZodSchema(schema: any): z.ZodTypeAny {
@@ -339,4 +317,4 @@ function createIntersectionSchema(schemas: any[]): z.ZodIntersection<z.ZodTypeAn
 }
 
 // Export the main tag function
-export default ts;
+export default yaml;
